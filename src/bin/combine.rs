@@ -161,8 +161,19 @@ mod tests {
     macro_rules! cmd {
         ( $program:expr, $( $arg:expr ),* ) => (
             {
-                let args = [ $( $arg ),* ];
-                cmd($program, args.iter())
+                let mut args:Vec<String> = vec![ $( $arg.to_string() ),* ];
+                let mut program = $program;
+                println!("########## program: {:?}", program);
+                println!("########## args: {:?}", args);
+                if cfg!(windows) && $program == "echo" {
+                    args = match args.as_slice() {
+                        [] => vec![ String::from("-Command"), String::from("Write-Output"), String::from("-InputObject"), String::from("") ],
+                        [s] if s.is_empty() => vec![ String::from("-Command"), String::from("Write-Output"), String::from("-InputObject"), String::from("''") ],
+                        _ => vec![ String::from("-Command"), String::from("Write-Output"), String::from("-InputObject"), $( $arg.to_string() ),* ],
+                    };
+                    program = "powershell";
+                }
+                cmd(program, args.iter())
             }
         )
     }
@@ -236,6 +247,7 @@ mod tests {
             ".trim();
         let echo = cmd!("echo", shares);
         let combine = echo.pipe(run_self!());
+        // [2025-09-21T22:45:51Z ERROR secret_share_combine] error while decoding share 1: invalid digit found in string
         let output = combine.read().unwrap();
         assert_eq!(output, "");
     }
