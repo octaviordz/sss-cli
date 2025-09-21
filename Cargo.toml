@@ -17,7 +17,8 @@ env_logger = "0.6"
 libc = "0.2"
 log = "0.4"
 rand = "0.7"
-shamirsecretsharing = "=0.1.4"
+# shamirsecretsharing = "=0.1.4"
+shamirsecretsharing = { path = "../sss-rs" }
 
 [dependencies.clap]
 version = "2.25"
@@ -26,3 +27,6 @@ features = [ "suggestions", "color" ]
 
 [dev-dependencies]
 duct = "0.12"
+
+[build-dependencies]
+cc = "1.0"
