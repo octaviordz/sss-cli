@@ -11,6 +11,10 @@ path = "src/bin/split.rs"
 name = "secret-share-combine"
 path = "src/bin/combine.rs"
 
+[[bin]]
+name = "echo"
+path = "src/bin/echo.rs"
+
 [dependencies]
 atty = "0.2"
 env_logger = "0.6"
