@@ -11,6 +11,7 @@ use std::env;
 use std::fmt;
 use std::fs::File;
 use std::io::prelude::*;
+use std::io::ErrorKind;
 use std::process::exit;
 
 use clap::{App, Arg, ArgMatches};
@@ -91,7 +92,10 @@ fn main() {
         None | Some("-") => Box::new(std::io::stdin()),
         Some(input_fn) => {
             Box::new(File::open(input_fn).unwrap_or_else(|err| {
-                error!("error while opening file '{}': {}", input_fn, err);
+                match err.kind() {
+                    ErrorKind::NotFound => error!("error while opening file '{}': {}", input_fn, err.kind()),
+                    _ => error!("error while opening file '{}': {}", input_fn, err),
+                }
                 exit(1);
             }))
         }
@@ -283,6 +287,6 @@ mod tests {
         assert_eq!(&output[ERR_RANGE], "ERROR");
         assert_eq!(&output[MSG_RANGE],
                    "error while opening file \'nonexistent\': \
-                    No such file or directory (os error 2)");
+                    entity not found");
     }
 }

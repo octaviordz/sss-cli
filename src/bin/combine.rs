@@ -161,30 +161,6 @@ mod tests {
     macro_rules! cmd {
         ( $program:expr, $( $arg:expr ),* ) => (
             {
-                // use std::ffi::OsString;
-                // println!("########## {}: {:?}", stringify!($program), $program);
-                // println!("########## arg: ");
-                // $(
-                //     println!("########## {}: {:?}", stringify!($arg), $arg);
-                // )*
-                // // let args = [ $( $arg.to_string().replace("\n", "\r\n") ),* ];
-                // let args: &[OsString] = &[$( Into::<OsString>::into($arg) ),*];
-                // println!("########## args: {:?}", args);
-                // let (program, argv) =
-                //     if cfg!(windows) && $program == "echo" {
-                //         let mut v = vec![ Into::<OsString>::into("-Command"), Into::<OsString>::into("Write-Output"), Into::<OsString>::into("-InputObject")];
-                //         match args {
-                //             [s] if s.is_empty() => v.push(Into::<OsString>::into("''")),
-                //             _ => v.extend(args.to_vec()),
-                //         };
-                //         ("powershell", v)
-                //     } else {
-                //         ($program, args.to_vec())
-                //     };
-                // println!("########## program: {:?}", program);
-                // println!("########## argv: {:?}", argv);
-                // cmd(program, argv.iter())
-
                 let args = [ $( $arg ),* ];
                 cmd($program, args.iter())
             }
