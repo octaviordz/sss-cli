@@ -161,19 +161,32 @@ mod tests {
     macro_rules! cmd {
         ( $program:expr, $( $arg:expr ),* ) => (
             {
-                let mut args:Vec<String> = vec![ $( $arg.to_string() ),* ];
-                let mut program = $program;
-                println!("########## program: {:?}", program);
-                println!("########## args: {:?}", args);
-                if cfg!(windows) && $program == "echo" {
-                    args = match args.as_slice() {
-                        [] => vec![ String::from("-Command"), String::from("Write-Output"), String::from("-InputObject"), String::from("") ],
-                        [s] if s.is_empty() => vec![ String::from("-Command"), String::from("Write-Output"), String::from("-InputObject"), String::from("''") ],
-                        _ => vec![ String::from("-Command"), String::from("Write-Output"), String::from("-InputObject"), $( $arg.to_string() ),* ],
-                    };
-                    program = "powershell";
-                }
-                cmd(program, args.iter())
+                // use std::ffi::OsString;
+                // println!("########## {}: {:?}", stringify!($program), $program);
+                // println!("########## arg: ");
+                // $(
+                //     println!("########## {}: {:?}", stringify!($arg), $arg);
+                // )*
+                // // let args = [ $( $arg.to_string().replace("\n", "\r\n") ),* ];
+                // let args: &[OsString] = &[$( Into::<OsString>::into($arg) ),*];
+                // println!("########## args: {:?}", args);
+                // let (program, argv) =
+                //     if cfg!(windows) && $program == "echo" {
+                //         let mut v = vec![ Into::<OsString>::into("-Command"), Into::<OsString>::into("Write-Output"), Into::<OsString>::into("-InputObject")];
+                //         match args {
+                //             [s] if s.is_empty() => v.push(Into::<OsString>::into("''")),
+                //             _ => v.extend(args.to_vec()),
+                //         };
+                //         ("powershell", v)
+                //     } else {
+                //         ($program, args.to_vec())
+                //     };
+                // println!("########## program: {:?}", program);
+                // println!("########## argv: {:?}", argv);
+                // cmd(program, argv.iter())
+
+                let args = [ $( $arg ),* ];
+                cmd($program, args.iter())
             }
         )
     }
@@ -245,6 +258,8 @@ mod tests {
 01b5d858849053ec0b475b84c580a0a50e13fc283bdebfee35082a1fbe99ef74206efc338ab1f54cbbc63d2807ba07d6f6
 02deb4f2a93e55d8a0a7644723b33ec94fa5ca52e5dfa1cc92c86f937a1d0114fb6efc338ab1f54cbbc63d2807ba07d6f6
             ".trim();
+        println!("########## no_content ##########");
+        println!("########## shares {}", shares);
         let echo = cmd!("echo", shares);
         let combine = echo.pipe(run_self!());
         // [2025-09-21T22:45:51Z ERROR secret_share_combine] error while decoding share 1: invalid digit found in string
@@ -262,6 +277,8 @@ c2e4c927ccb26abbc27ef9632ae4903853a569abefbca5882ea0e1e31c54df1a3d9b0ed09e90f653
 028cd8cb05ee80dab157d352da41e0e2a83a16bc0e975de7e55faf9b93f1c2924e6737bde1c0b5e6\
 c2e4c927ccb26abbc27ef9632ae4903853a569abefbca5882ea0e1e31c54df1a3d9b0ed09e90f653\
 6d0aeeb5b1654d3348cabcdcf04637a25ee9f001bd6e04dd8b0bee7383c863aa79".trim();
+        println!("########## demo_shares ##########");
+        println!("########## shares {}", shares);
         let echo = cmd!("echo", shares);
         let combine = echo.pipe(run_self!());
         let output = combine.stdout_capture().run().unwrap();
