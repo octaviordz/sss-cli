@@ -12,3 +12,5 @@ Cargo.lock
 
 # Files used by vs-code
 .vscode/
+# Files used by Visual Studio
+.vs/
