@@ -13,7 +13,6 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::ErrorKind;
 use std::process::exit;
-use std::io::{Read, Cursor};
 
 use clap::{App, Arg, ArgMatches};
 use rand::random;
@@ -89,7 +88,7 @@ fn main() {
             }) as u8;
 
     // Open the input file and read its contents
-    let mut input_file_: Box<dyn Read> = match input_fn {
+    let mut input_file: Box<dyn Read> = match input_fn {
         None | Some("-") => Box::new(std::io::stdin()),
         Some(input_fn) => {
             Box::new(File::open(input_fn).unwrap_or_else(|err| {
@@ -101,35 +100,6 @@ fn main() {
             }))
         }
     };
-    eprintln!("########## Split ##########");
-    let mut buf: [u8; 256] = [0; 256];
-    let mut vec_from_buffer:Vec<u8>=Vec::new();
-    let mut bytes_read:usize;
-    {
-    let handle = input_file_.by_ref();
-    loop {
-        bytes_read = handle.read(&mut buf).unwrap();
-        if bytes_read == 0 {
-            break;
-        }
-        vec_from_buffer = buf[0..bytes_read].to_vec();
-        eprintln!("Read {} bytes.", bytes_read);
-        eprintln!("Read {:?} bytes.", &buf[0..bytes_read]);
-    }
-    }
-    let mut input_file: Box<dyn Read> = Box::new(Cursor::new(vec_from_buffer));
-    // eprintln!("########## Split(2) ##########");
-    // {
-    // let handle = input_file.by_ref();
-    // loop {
-    //     let bytes_read = handle.read(&mut buf).unwrap();
-    //     if bytes_read == 0 {
-    //         break;
-    //     }
-    //     eprintln!("Read {} bytes.", bytes_read);
-    //     eprintln!("Read {:?} bytes.", &buf[0..bytes_read]);
-    // }
-    // }
     // We are not able to use the normal API for variable length plaintexts, so we will have to
     // use the hazmat API and encrypt the file ourselves
     let key: [u8; KEY_SIZE] = random();
